@@ -32,11 +32,11 @@ app.post('/restaurants/:id', async (req, res) => {
 // PUT request route to update an existing restaurant resource
 app.put('/restaurants/:id', async (req, res) => {
    try {
-      const { name, address, rating } = req.body;
+      const { name, address, cuisine } = req.body;
       const updatedRest = await Restaurant.update({
          name,
          address,
-         rating
+         cuisine
       }, {
          where: {
             id: req.params.id
