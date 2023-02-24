@@ -1,6 +1,7 @@
 const express = require ("express")
 const router = express.Router()
 const Restaurant = require("../models/Restaurant")
+const {check, validationResult} = require("express-validator");
 
 router.get('/restaurants' , async (req, res) => {
     const fetchedRestaurants = await Restaurant.findAll(); 
@@ -15,22 +16,20 @@ res.json(fetchedrest)
 });
 
 // POST request route to create a new restaurant resource
-router.post('/restaurants/:id', async (req, res) => {
-try {
-const { name, address, rating } = req.body;
-console.log('Creating restaurant with data: ', req.body);
-const newRest = await Restaurant.create({
-name,
-address,
-rating
-});
-console.log('Successfully created restaurant: ', newRest);
-res.json(newRest);
-} catch (err) {
-console.error(err);
-res.status(500).json({ error: 'Unable to create restaurant' });
-}
-});
+router.post('/restaurants/:id', [check('name').not().isEmpty().trim()], [check('location').not().isEmpty().trim()], [check('cuisine').not().isEmpty().trim()], async (req, res) => {
+    const {name, location, cuisine} = req.body;
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+    res.json({error: errors.array()});
+    } else {
+    const newRest = await Restaurant.create({
+    name,
+    location,
+    cuisine
+    });
+    res.send(newRest);
+    }
+    });
 
 // PUT request route to update an existing restaurant resource
 router.put('/restaurants/:id', async (req, res) => {
